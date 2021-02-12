@@ -8,5 +8,5 @@ test_images, test_labels = get_data('fashion-mnist_test.csv')
 # print(test_images.size())
 # print(test_labels.size())
 
-train_acc, test_acc = train_and_test_model(train_images, train_labels, test_images, test_labels)
+train_acc, test_acc = train_and_test_model(train_images, train_labels, test_images, test_labels, 1)
 print(train_acc, test_acc)

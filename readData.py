@@ -36,7 +36,7 @@ def one_hot_encode_labels(labels):
 # load data, encode it, change data to floats and get data to gpu (if cuda available)
 def get_data(path, plot=False):
     data, labels = load_data(path, plot)
-    labels = one_hot_encode_labels(labels)
+    # labels = one_hot_encode_labels(labels)
     data = torch.from_numpy(data)
     labels = torch.from_numpy(labels)
     data = data.float()

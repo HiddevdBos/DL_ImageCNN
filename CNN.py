@@ -25,7 +25,7 @@ class CNN(Module):
 
         # put random tensor through convolutional layers to determine dimensions for linear layers
         x = torch.randn(28, 28).view(-1, 1, 28, 28)
-        self.cnn_layers(x)
+        x = self.cnn_layers(x)
         self.input_size_linear = x.shape[1] * x.shape[2] * x.shape[3]
 
         self.linear_layers = Sequential(
@@ -88,9 +88,9 @@ def train_and_test_model(train_x, train_y, test_x, test_y, n=5):
     train_acc = []
     test_acc = []
     for i in range(n):
-        model, loss = train_model(train_x, train_y)
-        train_acc.append(1 - loss)
+        model, loss = train_model(train_x, train_y, epochs=50)
+        acc = eval_cnn(train_x, train_y, model)
+        train_acc.append(acc)
         acc = eval_cnn(test_x, test_y, model)
-        print(acc)
         test_acc.append(acc)
     return np.mean(train_acc), np.mean(test_acc)
