@@ -9,7 +9,6 @@ import numpy as np
 class CNN(Module):
     def __init__(self):
         super(CNN, self).__init__()
-        self.input_size_linear = None
 
         self.cnn_layers = Sequential(
             # 2D convolution layer
@@ -24,6 +23,7 @@ class CNN(Module):
             MaxPool2d(kernel_size=2, stride=2),
         )
 
+        # put random tensor through convolutional layers to determine dimensions for linear layers
         x = torch.randn(28, 28).view(-1, 1, 28, 28)
         self.cnn_layers(x)
         self.input_size_linear = x.shape[1] * x.shape[2] * x.shape[3]
@@ -41,28 +41,34 @@ class CNN(Module):
 
 
 def train_model(train_x, train_y, epochs=20, learning_rate=0.01, weight_decay=0.01, batch_size=None):
-    print(train_y)
     model = CNN()
     model = model.float()
     optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     criterion = CrossEntropyLoss()
+
+    # default batch size is entire dataset
     if not batch_size or batch_size > train_x.shape[0]:
         batch_size = train_x.shape[0]
-    num_batches = train_x.shape[0] / batch_size
+    num_batches = int(train_x.shape[0] / batch_size)
+
     train_x = train_x.reshape(-1, batch_size, 1, 28, 28)
     train_y = train_y.reshape(-1, batch_size)
 
     loss_list = []
     for epoch in tqdm(range(0, epochs)):
-        for i in range(train_x.shape[0]):
+        for i in range(num_batches):
+            # forward step
             outputs = model.forward(train_x[i])
             train_y = train_y.long()
             loss = criterion(outputs, train_y[i])
             loss_list.append(loss.item())
 
+            # backwards step
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+    # return the model and the average training loss
     return model, np.mean(loss_list)
 
 
@@ -74,6 +80,7 @@ def eval_cnn(test_x, test_y, model):
     for i in range(total):
         if predicted[i] == test_y[i]:
             correct += 1
+    # return testing accuracy
     return correct / total
 
 
