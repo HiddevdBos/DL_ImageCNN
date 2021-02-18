@@ -13,12 +13,12 @@ class CNN(Module):
         self.cnn_layers = Sequential(
             # 2D convolution layer
             Conv2d(1, 4, kernel_size=3, stride=1, padding=1),
-            BatchNorm2d(4),
+            # BatchNorm2d(4),
             ReLU(inplace=True),
             MaxPool2d(kernel_size=2, stride=2),
             # 2D convolution layer
             Conv2d(4, 4, kernel_size=3, stride=1, padding=1),
-            BatchNorm2d(4),
+            # BatchNorm2d(4),
             ReLU(inplace=True),
             MaxPool2d(kernel_size=2, stride=2),
         )
@@ -55,7 +55,7 @@ def train_model(train_x, train_y, epochs=20, learning_rate=0.01, weight_decay=0.
     train_y = train_y.reshape(-1, batch_size)
 
     loss_list = []
-    for epoch in tqdm(range(0, epochs), desc='epochs'):
+    for epoch in range(0, epochs):
         for i in range(num_batches):
             # forward step
             outputs = model.forward(train_x[i])
@@ -89,7 +89,8 @@ def train_and_test_model(train_x, train_y, test_x, test_y,
     train_acc = []
     test_acc = []
     for i in range(n_runs):
-        print('run', i+1, '/', n_runs)
+        if n_runs != 1:
+            print('run', i+1, '/', n_runs)
         model, loss = train_model(train_x, train_y,
                                   epochs=epochs,
                                   learning_rate=learning_rate,
@@ -128,7 +129,7 @@ def cross_validation(images, labels, k):
         acc_valid_list = list()
 
         # train a new model for each fold
-        for fold in range(0, k):
+        for fold in tqdm(range(0, k), desc='folds'):
             train_x = folds_x.copy()
             train_y = folds_y.copy()
             valid_x = train_x.pop(fold)
