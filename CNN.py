@@ -136,7 +136,9 @@ def cross_validation(images, labels, k):
             train_x = torch.cat(train_x)
             train_y = torch.cat(train_y)
 
-            acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, epochs=2,
+            # n_runs should be 1 for this
+            #
+            acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, epochs=20,
                                                         weight_decay=m, batch_size=50, n_runs=1)
             acc_train_list.append(acc_train)
             acc_valid_list.append(acc_valid)
