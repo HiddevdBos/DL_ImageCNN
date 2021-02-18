@@ -115,7 +115,7 @@ def cross_validation(images, labels, k):
     # this parameter is also set equal to m in the train_and_test_model call below
     m_name = 'weight decay'
     start = 0
-    stop = 0.02
+    stop = 0.2
     step = 0.01
 
     best_m = 0
