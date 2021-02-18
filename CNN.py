@@ -84,11 +84,17 @@ def eval_cnn(test_x, test_y, model):
     return correct / total
 
 
-def train_and_test_model(train_x, train_y, test_x, test_y, n=5):
+def train_and_test_model(train_x, train_y, test_x, test_y,
+                         n_runs=5, epochs=20, learning_rate=0.01, weight_decay=0.01, batch_size=None):
     train_acc = []
     test_acc = []
-    for i in range(n):
-        model, loss = train_model(train_x, train_y, epochs=50)
+    for i in range(n_runs):
+        print('run', i+1, '/', n_runs)
+        model, loss = train_model(train_x, train_y,
+                                  epochs=epochs,
+                                  learning_rate=learning_rate,
+                                  weight_decay=weight_decay,
+                                  batch_size=batch_size)
         acc = eval_cnn(train_x, train_y, model)
         train_acc.append(acc)
         acc = eval_cnn(test_x, test_y, model)
