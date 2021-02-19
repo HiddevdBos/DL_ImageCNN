@@ -45,6 +45,9 @@ def train_model(train_x, train_y, epochs=20, learning_rate=0.01, weight_decay=0.
     model = model.float()
     optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     criterion = CrossEntropyLoss()
+    if torch.cuda.is_available():
+        model = model.cuda()
+        criterion = criterion.cuda()
 
     # default batch size is entire dataset
     if not batch_size or batch_size > train_x.shape[0]:
