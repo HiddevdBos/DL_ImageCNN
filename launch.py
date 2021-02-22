@@ -3,9 +3,11 @@ from CNN import train_and_test_model, cross_validation
 from plots import plotTrainTestError
 import torch
 
+print("working")
 available_gpus = [torch.cuda.device(i) for i in range(torch.cuda.device_count())]
 print(available_gpus)
-exit()
+print("printings")
+# exit()
 train_images, train_labels = get_data('fashion-mnist_train.csv', plot=False)
 # print(train_images.size())
 # print(train_labels.size())
