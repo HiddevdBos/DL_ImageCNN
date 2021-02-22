@@ -1,7 +1,7 @@
 import torch
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
-from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout
+from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout, DataParallel
 from tqdm import tqdm
 import numpy as np
 
@@ -46,6 +46,8 @@ def train_model(train_x, train_y, epochs=20, learning_rate=0.01, weight_decay=0.
     optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     criterion = CrossEntropyLoss()
     if torch.cuda.is_available():
+        model = DataParallel(model)
+        print("Using ", torch.cuda.device_count(), " GPUs")
         model = model.cuda()
         criterion = criterion.cuda()
 
