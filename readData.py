@@ -48,7 +48,7 @@ def get_data(path, plot=False):
 
 def get_dummy_data():
     data = np.random.rand(10 ,1, 28, 28)
-    label = np.random.rand(10 ,1)
+    labels = np.random.rand(10 ,1)
     data = torch.from_numpy(data)
     labels = torch.from_numpy(labels)
     data = data.float()

@@ -1,4 +1,4 @@
-from readData import get_data
+from readData import get_data, get_dummy_data
 from CNN import train_and_test_model, cross_validation
 from plots import plotTrainTestError
 import torch
