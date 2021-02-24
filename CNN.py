@@ -1,6 +1,6 @@
 import torch
 from torch.nn import CrossEntropyLoss
-from torch.optim import Adam
+from torch.optim import Adam, RMSprop, SGD
 from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout, DataParallel
 from tqdm import tqdm
 import numpy as np
@@ -42,7 +42,7 @@ class CNN(Module):
 def train_model(train_x, train_y, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer = None):
     model = CNN().float()
     if optimizer:
-        optimizer = select_optimizer(model.parameters())
+        optimizer = select_optimizer(optimizer, model.parameters())
     else:
         optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     criterion = CrossEntropyLoss()
@@ -107,17 +107,15 @@ def set_hyperparameter(hyperparameter):
     if hyperparameter == 'weight decay':
         m_name = 'weight decay'
         start = 0
-        stop = 0.5
-        step = 0.25
-        m_range = np.arange(start, stop, step)
-    
+        m_range = np.array([0, 0.1, 0.001, 0.001, 0.0001, 0.00001])
+
     if hyperparameter == 'epochs':
         m_name = 'epochs'
         start = 25
         stop = 200
         step = 25
         m_range = np.arange(start, stop, step)
-    return m_name, m_range
+    return m_name, m_range, start
 
 
 def select_optimizer(optimizer, parameters):
@@ -130,7 +128,7 @@ def select_optimizer(optimizer, parameters):
     return optimizer
 
     
-def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter, optimizer, n_runs = 1, epochs = 100):
+def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter, optimizer = None, n_runs = 1, epochs = 200):
     if hyperparameter == 'weight decay':
         acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs = n_runs, epochs = epochs, weight_decay = m)
     if hyperparameter == 'epochs':
@@ -144,7 +142,7 @@ def cross_validation(images, labels, k, hyperparameter, optimizer = None):
 
     # range of the parameter m that is optimized
     # this parameter is also set equal to m in the train_and_test_model call below
-    m_name, m_range = set_hyperparameter(hyperparameter)
+    m_name, m_range, start = set_hyperparameter(hyperparameter)
 
     print(f'training and evaluating', k * len(m_range), 'models')
 

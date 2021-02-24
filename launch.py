@@ -1,7 +1,7 @@
 import sys
 import torch
 from readData import get_data
-from CNN import train_and_test_model, cross_validation
+from CNN import choose_train_and_test_model, cross_validation
 from plots import plotTrainTestError
 
 def show_error():
@@ -9,9 +9,6 @@ def show_error():
 	sys.exit()
 
 if __name__ == '__main__':
-
-	print(torch.cuda.device_count())
-	exit()
 
 	train_images, train_labels = get_data('fashion-mnist_train.csv')
 	test_images, test_labels = get_data('fashion-mnist_test.csv')
@@ -30,15 +27,15 @@ if __name__ == '__main__':
 
 
   #------------------Optimizer--------------------#
-	if(sys.argv[1] == 'optimizer'):
+	elif(sys.argv[1] == 'optimizer'):
 		if len(sys.argv) < 3:
 			show_error()
 		# ---- cross-validation ----
-		best_m, acc_train, acc_valid, m_list, m_name = cross_validation(train_images, train_labels, sys.argv[2], k=5, hyper_parameter = 'epochs')
+		best_m, acc_train, acc_valid, m_list, m_name = cross_validation(train_images, train_labels, optimizer = sys.argv[2], k=5, hyperparameter = 'epochs')
 		plotTrainTestError(acc_train, acc_valid, m_name, x_values=m_list)
 		print(f'optimal value for {m_name}: {best_m}')
 
 		# ---- testing ----
-		train_acc, test_acc = train_and_test_model(train_images, train_labels, test_images, test_labels, sys.argv[2], n_runs=5, epochs=best_m)
+		train_acc, test_acc = choose_train_and_test_model(train_images, train_labels, test_images, test_labels, best_m, optimizer = sys.argv[2], n_runs=5, hyperparameter = 'epochs')
 		print('average training accuracy:', train_acc)
 		print('average testing accuracy:', test_acc)
