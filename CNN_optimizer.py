@@ -1,6 +1,6 @@
 import torch
 from torch.nn import CrossEntropyLoss
-from torch.optim import Adam
+from torch.optim import Adam, RMSprop, SGD
 from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout, DataParallel
 from tqdm import tqdm
 import numpy as np
@@ -13,12 +13,12 @@ class CNN(Module):
         self.cnn_layers = Sequential(
             # 2D convolution layer
             Conv2d(1, 4, kernel_size=3, stride=1, padding=1),
-            # BatchNorm2d(4),
+            BatchNorm2d(4),
             ReLU(inplace=True),
             MaxPool2d(kernel_size=2, stride=2),
             # 2D convolution layer
             Conv2d(4, 4, kernel_size=3, stride=1, padding=1),
-            # BatchNorm2d(4),
+            BatchNorm2d(4),
             ReLU(inplace=True),
             MaxPool2d(kernel_size=2, stride=2),
         )
@@ -39,9 +39,9 @@ class CNN(Module):
         return x
 
 
-def train_model(train_x, train_y, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None):
+def train_model(train_x, train_y, optimizer, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None):
     model = CNN().float()
-    optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    optimizer = select_optimizer(optimizer, model.parameters())
     criterion = CrossEntropyLoss()
     if torch.cuda.is_available():
         model = DataParallel(model)
@@ -79,7 +79,7 @@ def evaluate_model(test_x, test_y, model):
     return correct / total
 
 
-def train_and_test_model(train_x, train_y, test_x, test_y,
+def train_and_test_model(train_x, train_y, test_x, test_y, optimizer,
                          n_runs=5, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None):
     train_acc = 0
     test_acc = 0
@@ -87,7 +87,7 @@ def train_and_test_model(train_x, train_y, test_x, test_y,
     for i in range(n_runs):
         if n_runs != 1:
             print('run', i+1, '/', n_runs)
-        model = train_model(train_x, train_y,
+        model = train_model(train_x, train_y, optimizer,
                                   epochs=epochs,
                                   learning_rate=learning_rate,
                                   weight_decay=weight_decay,
@@ -98,18 +98,26 @@ def train_and_test_model(train_x, train_y, test_x, test_y,
         test_acc = (test_acc + acc)
     return train_acc/n_runs, test_acc/n_runs
 
+def select_optimizer(optimizer, parameters):
+    if optimizer == 'adam':
+        optimizer = Adam(parameters)
+    if optimizer == 'rmsprop':
+        optimizer = RMSprop(parameters)
+    if optimizer == 'sgd':
+        optimizer = SGD(parameters)
+    return optimizer
 
-def cross_validation(images, labels, k):
+def cross_validation(images, labels, optimizer, k):
     # setup the k-fold split
     folds_x = list(torch.chunk(images, k))
     folds_y = list(torch.chunk(labels, k))
 
     # range of the parameter m that is optimized
     # this parameter is also set equal to m in the train_and_test_model call below
-    m_name = 'weight decay'
-    start = 0
-    stop = 0.5
-    step = 0.25
+    m_name = 'epochs'
+    start = 25
+    stop = 200
+    step = 25
 
     m_range = np.arange(start, stop, step)
     print(f'training and evaluating', k * len(m_range), 'models')
@@ -127,8 +135,7 @@ def cross_validation(images, labels, k):
             train_y = torch.cat(train_y)
 
             # n_runs should be 1 for this            
-            acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs=1, epochs=3,
-                                                        weight_decay=m)
+            acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, optimizer, n_runs=1, epochs=m)
                         
             acc_valid_mean = (acc_valid_mean + acc_valid)
             acc_train_mean = (acc_train_mean + acc_train)

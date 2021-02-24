@@ -1,10 +1,6 @@
 import zipfile
 import numpy as np
 import torch
-import time
-
-time_start = time.time()
-
 
 # load data and labels from zipfile, and store in numpy arrays
 def load_data(path):
