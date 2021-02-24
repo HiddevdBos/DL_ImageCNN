@@ -1,7 +1,7 @@
 import sys
 import torch
 from readData import get_data
-from CNN import choose_train_and_test_model, cross_validation
+from runModel import choose_train_and_test_model, cross_validation
 from plots import plotTrainTestError
 
 def show_error():
