@@ -7,8 +7,9 @@ import numpy as np
 from CNN import CNN
 
 
-def train_model(train_x, train_y, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer=None):
-    model = CNN().float()
+def train_model(train_x, train_y, cnn_type, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None,
+                optimizer=None):
+    model = CNN(cnn_type).float()
     if optimizer:
         optimizer = select_optimizer(optimizer, model.parameters())
     else:
@@ -69,11 +70,17 @@ def train_and_test_model(train_x, train_y, test_x, test_y,
         train_acc = (train_acc + acc)
         acc = evaluate_model(test_x, test_y, model)
         test_acc = (test_acc + acc)
-    return (train_acc / n_runs).item(), (test_acc / n_runs).item()
+    return train_acc / n_runs, test_acc / n_runs
 
 
 def set_hyperparameter(hyperparameter):
-    if hyperparameter == 'weight decay':
+    if hyperparameter == 'dropout rate':
+        m_name = 'dropout rate'
+        start = 0
+        stop = 0.75
+        step = 0.05
+        m_range = np.arange(start, stop, step)
+    elif hyperparameter == 'weight decay':
         m_name = 'weight decay'
         start = 0
         m_range = np.array([0, 0.1, 0.001, 0.001, 0.0001, 0.00001])
@@ -97,22 +104,23 @@ def select_optimizer(optimizer, parameters):
         optimizer = Adam(parameters)
     if optimizer == 'rmsprop':
         optimizer = RMSprop(parameters)
-    if optimizer == 'sgd':
-        optimizer = SGD(parameters)
     return optimizer
 
 
-def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter, optimizer=None, n_runs=1,
+def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type = 'standard', hyperparameter, optimizer=None, n_runs=1,
                                 epochs=200):
     if hyperparameter == 'weight decay':
-        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs=n_runs, epochs=epochs,
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs=n_runs, epochs=epochs,
                                                     weight_decay=m)
     if hyperparameter == 'epochs':
-        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs=n_runs, epochs=m,
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs=n_runs, epochs=m,
                                                     optimizer=optimizer)
     if hyperparameter == 'learning rate':
-        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs=n_runs, epochs=epochs,
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs=n_runs, epochs=epochs,
                                                     learning_rate=m)
+    if hyperparameter == 'dropout rate':
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs=n_runs,
+                                                    epochs=epochs, weight_decay=m)
     return acc_train, acc_valid
 
 
@@ -140,8 +148,7 @@ def cross_validation(images, labels, k, hyperparameter, optimizer=None):
             train_y = torch.cat(train_y)
 
             # n_runs should be 1 for this            
-            acc_train, acc_valid = choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter,
-                                                               optimizer)
+            acc_train, acc_valid = choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type, hyperparameter, optimizer)
 
             acc_valid_mean = (acc_valid_mean + acc_valid)
             acc_train_mean = (acc_train_mean + acc_train)
