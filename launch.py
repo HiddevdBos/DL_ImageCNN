@@ -3,9 +3,6 @@ from readData import get_data
 from runModel import choose_train_and_test_model, cross_validation, train_and_test_model
 from plots import plotTrainTestError
 
-train_images, train_labels = get_data('fashion-mnist_train.csv')
-test_images, test_labels = get_data('fashion-mnist_test.csv')
-train_and_test_model(train_images,train_labels,test_images,test_labels,'lenet5',n_runs=1)
 
 def show_error():
     print("Please pass the required arguments")
