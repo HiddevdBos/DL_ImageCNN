@@ -4,7 +4,7 @@ from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, AvgPool2d, Mod
 
 class CNN(Module):
 
-    def __init__(self, cnn_type):
+    def __init__(self, cnn_type, dropout_rate = None):
         super(CNN, self).__init__()
         if cnn_type == 'standard':
             self.cnn_layers = Sequential(
@@ -20,16 +20,31 @@ class CNN(Module):
                 MaxPool2d(kernel_size=2, stride=2),
             )
 
-        if cnn_type == 'no-batch':
+
+        if cnn_type == 'dropout':
             self.cnn_layers = Sequential(
                 # 2D convolution layer
                 Conv2d(1, 4, kernel_size=3, stride=1, padding=1),
-                BatchNorm2d(4),
+                Dropout(dropout_rate),
                 ReLU(inplace=True),
                 MaxPool2d(kernel_size=2, stride=2),
                 # 2D convolution layer
                 Conv2d(4, 4, kernel_size=3, stride=1, padding=1),
-                BatchNorm2d(4),
+                Dropout(dropout_rate),
+                ReLU(inplace=True),
+                MaxPool2d(kernel_size=2, stride=2),
+            )
+
+        if cnn_type == 'no-batch':
+            self.cnn_layers = Sequential(
+                # 2D convolution layer
+                Conv2d(1, 4, kernel_size=3, stride=1, padding=1),
+                #BatchNorm2d(4),
+                ReLU(inplace=True),
+                MaxPool2d(kernel_size=2, stride=2),
+                # 2D convolution layer
+                Conv2d(4, 4, kernel_size=3, stride=1, padding=1),
+                #BatchNorm2d(4),
                 ReLU(inplace=True),
                 MaxPool2d(kernel_size=2, stride=2),
             )
@@ -76,23 +91,23 @@ class CNN(Module):
                 # 2D convolution layer
                 Conv2d(1, 4, kernel_size=3, stride=1, padding=1),
                 BatchNorm2d(4),
-                LeakyReLU(),
+                LeakyReLU(inplace=True),
                 MaxPool2d(kernel_size=2, stride=2),
                 # 2D convolution layer
                 Conv2d(4, 4, kernel_size=3, stride=1, padding=1),
                 BatchNorm2d(4),
-                LeakyReLU(),
+                LeakyReLU(inplace=True),
                 MaxPool2d(kernel_size=2, stride=2),
             )
 
         if cnn_type == 'lenet5':
             self.cnn_layers = Sequential(
                 Conv2d(1, 6, kernel_size=5, stride=1, padding=2),
-                # BatchNorm2d(6),
+                BatchNorm2d(6),
                 ReLU(inplace=True),
                 AvgPool2d(kernel_size=2, stride=2, padding=0),
                 Conv2d(6, 16, kernel_size=5, stride=1, padding=1),
-                # BatchNorm2d(16),
+                BatchNorm2d(16),
                 ReLU(inplace=True),
                 AvgPool2d(kernel_size=2, stride=2),
             )

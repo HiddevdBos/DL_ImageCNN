@@ -1,5 +1,5 @@
 import torch
-from torch.nn import CrossEntropyLoss
+from torch.nn import CrossEntropyLoss, DataParallel
 from torch.optim import Adam, SGD, RMSprop
 from tqdm import tqdm
 import numpy as np
@@ -8,8 +8,11 @@ from CNN import CNN
 
 
 def train_model(train_x, train_y, cnn_type, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None,
-                optimizer=None):
-    model = CNN(cnn_type).float()
+                optimizer=None, dropout_rate = None):
+    if cnn_type == 'dropout':
+        model = CNN(cnn_type, dropout_rate).float()
+    else:
+        model = CNN(cnn_type).float()
     if optimizer:
         optimizer = select_optimizer(optimizer, model.parameters())
     else:
@@ -53,10 +56,9 @@ def evaluate_model(test_x, test_y, model):
 
 
 def train_and_test_model(train_x, train_y, test_x, test_y, cnn_type='standard',
-                         n_runs=5, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer=None):
+                         n_runs=5, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer=None, dropout_rate = None):
     train_acc = 0
     test_acc = 0
-
     for i in range(n_runs):
         if n_runs != 1:
             print('run', i + 1, '/', n_runs)
@@ -65,7 +67,8 @@ def train_and_test_model(train_x, train_y, test_x, test_y, cnn_type='standard',
                             learning_rate=learning_rate,
                             weight_decay=weight_decay,
                             batch_size=batch_size,
-                            optimizer=optimizer)
+                            optimizer=optimizer,
+                            dropout_rate = dropout_rate)
         acc = evaluate_model(train_x, train_y, model)
         train_acc = (train_acc + acc)
         acc = evaluate_model(test_x, test_y, model)
@@ -86,8 +89,8 @@ def set_hyperparameter(hyperparameter):
         m_range = np.array([0, 0.1, 0.001, 0.001, 0.0001, 0.00001])
     elif hyperparameter == 'epochs':
         m_name = 'epochs'
-        start = 25
-        stop = 200
+        start = 200
+        stop = 225
         step = 25
         m_range = np.arange(start, stop, step)
     elif hyperparameter == 'learning rate':
@@ -120,7 +123,7 @@ def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type,
                                                     learning_rate=m)
     if hyperparameter == 'dropout rate':
         acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs=n_runs,
-                                                    epochs=epochs, weight_decay=m)
+                                                    epochs=epochs, weight_decay=m, dropout_rate = m)
     return acc_train, acc_valid
 
 

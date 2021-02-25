@@ -56,8 +56,7 @@ if __name__ == '__main__':
                 show_error()
             # ---- cross-validation ----
             best_m, acc_train, acc_valid, m_list, m_name = cross_validation(train_images, train_labels, k=5,
-                                                                            cnn_type=sys.argv[2],
-                                                                            hyperparameter='epochs')
+                                                                            cnn_type=sys.argv[2], hyperparameter='epochs')
             plotTrainTestError(acc_train, acc_valid, m_name, x_values=m_list)
             print(f'optimal value for {m_name}: {best_m}')
 
@@ -69,17 +68,34 @@ if __name__ == '__main__':
             print('average training accuracy:', train_acc)
             print('average testing accuracy:', test_acc)
 
+
+        if sys.argv[1] == 'learning_rate':
+	        # ---- cross-validation ----
+	        best_m, acc_train, acc_valid, m_list, m_name = cross_validation(train_images, train_labels, k=5,
+	                                                                        cnn_type=sys.argv[2], hyperparameter='learning rate')
+	        plotTrainTestError(acc_train, acc_valid, m_name, x_values=m_list)
+	        print(f'optimal value for {m_name}: {best_m}')
+
+	        # ---- testing ----
+	        train_acc, test_acc = choose_train_and_test_model(train_images, train_labels, test_images, test_labels, best_m,
+	                                                          n_runs=10, cnn_type=sys.argv[2], epochs=200,
+	                                                          hyperparameter='learning rate')
+	        print('test = ', sys.argv)
+	        print('average training accuracy:', train_acc)
+	        print('average testing accuracy:', test_acc)
+
+
         if sys.argv[1] == 'dropout':
             # ---- cross-validation ----
             best_m, acc_train, acc_valid, m_list, m_name = cross_validation(train_images, train_labels, k=5,
-                                                                            cnn_type='dropout', hyperparameter='epochs')
+                                                                            cnn_type='dropout', hyperparameter='dropout rate')
             plotTrainTestError(acc_train, acc_valid, m_name, x_values=m_list)
             print(f'optimal value for {m_name}: {best_m}')
 
             # ---- testing ----
             train_acc, test_acc = choose_train_and_test_model(train_images, train_labels, test_images, test_labels,
-                                                              best_m, n_runs=10, cnn_type='dropout',
-                                                              hyperparameter='epochs')
+                                                              best_m, n_runs=10, cnn_type='dropout', hyperparameter='dropout rate')
             print('test = ', sys.argv)
             print('average training accuracy:', train_acc)
             print('average testing accuracy:', test_acc)
+
