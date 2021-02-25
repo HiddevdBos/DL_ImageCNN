@@ -1,5 +1,5 @@
 import torch
-from torch.nn import CrossEntropyLoss
+from torch.nn import CrossEntropyLoss, DataParallel
 from torch.optim import Adam, SGD, RMSprop
 from tqdm import tqdm
 import numpy as np
@@ -70,6 +70,13 @@ def train_and_test_model(train_x, train_y, test_x, test_y, cnn_type,
 
 
 def set_hyperparameter(hyperparameter):
+    if hyperparameter == 'dropout rate':
+        m_name = 'dropout rate'
+        start = 0
+        stop = 0.75
+        step = 0.05
+        m_range = np.arange(start, stop, step)
+
     if hyperparameter == 'weight decay':
         m_name = 'weight decay'
         start = 0
@@ -97,6 +104,8 @@ def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type=
         acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs = n_runs, epochs = epochs, weight_decay = m)
     if hyperparameter == 'epochs':
         acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs = n_runs, epochs = m, optimizer = optimizer)
+    if hyperparameter == 'dropout rate':
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs = n_runs, epochs = epochs, weight_decay = m)
     return acc_train, acc_valid
 
 def cross_validation(images, labels, k, hyperparameter, cnn_type = 'standard', optimizer = None):
