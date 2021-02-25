@@ -2,6 +2,7 @@ import zipfile
 import numpy as np
 import torch
 
+
 # load data and labels from zipfile, and store in numpy arrays
 def load_data(path):
     with zipfile.ZipFile('data.zip') as data:
@@ -17,6 +18,7 @@ def load_data(path):
         image = list(map(int, image[1:]))
         data.append(image)
     return np.array(data).reshape(len(data), 1, 28, 28), np.array(labels)
+
 
 # load data, change data to floats and get data to gpu (if cuda available)
 def get_data(path):

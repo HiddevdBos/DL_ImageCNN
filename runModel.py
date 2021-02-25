@@ -6,7 +6,8 @@ import numpy as np
 
 from CNN import CNN
 
-def train_model(train_x, train_y, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer = None):
+
+def train_model(train_x, train_y, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer=None):
     model = CNN().float()
     if optimizer:
         optimizer = select_optimizer(optimizer, model.parameters())
@@ -32,14 +33,15 @@ def train_model(train_x, train_y, epochs=50, learning_rate=0.01, weight_decay=0.
             train_y = train_y.long()
             loss = criterion(outputs, train_y[i])
             # loss_list.append(loss.item())
-            
+
             # backwards step
             optimizer.zero_grad()
-            loss.backward()            
+            loss.backward()
             optimizer.step()
 
     # return the model and the average training loss
     return model
+
 
 def evaluate_model(test_x, test_y, model):
     output = model.forward(test_x)
@@ -50,24 +52,24 @@ def evaluate_model(test_x, test_y, model):
 
 
 def train_and_test_model(train_x, train_y, test_x, test_y,
-                         n_runs=5, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer = None):
+                         n_runs=5, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer=None):
     train_acc = 0
     test_acc = 0
-    
+
     for i in range(n_runs):
         if n_runs != 1:
-            print('run', i+1, '/', n_runs)
+            print('run', i + 1, '/', n_runs)
         model = train_model(train_x, train_y,
-                                  epochs=epochs,
-                                  learning_rate=learning_rate,
-                                  weight_decay=weight_decay,
-                                  batch_size=batch_size,
-                                  optimizer = optimizer)
+                            epochs=epochs,
+                            learning_rate=learning_rate,
+                            weight_decay=weight_decay,
+                            batch_size=batch_size,
+                            optimizer=optimizer)
         acc = evaluate_model(train_x, train_y, model)
         train_acc = (train_acc + acc)
         acc = evaluate_model(test_x, test_y, model)
         test_acc = (test_acc + acc)
-    return train_acc/n_runs, test_acc/n_runs
+    return (train_acc / n_runs).item(), (test_acc / n_runs).item()
 
 
 def set_hyperparameter(hyperparameter):
@@ -75,12 +77,17 @@ def set_hyperparameter(hyperparameter):
         m_name = 'weight decay'
         start = 0
         m_range = np.array([0, 0.1, 0.001, 0.001, 0.0001, 0.00001])
-
-    if hyperparameter == 'epochs':
+    elif hyperparameter == 'epochs':
         m_name = 'epochs'
         start = 25
         stop = 200
         step = 25
+        m_range = np.arange(start, stop, step)
+    elif hyperparameter == 'learning rate':
+        m_name = 'epochs'
+        start = 0.005
+        stop = 0.1
+        step = 0.005
         m_range = np.arange(start, stop, step)
     return m_name, m_range, start
 
@@ -94,15 +101,22 @@ def select_optimizer(optimizer, parameters):
         optimizer = SGD(parameters)
     return optimizer
 
-    
-def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter, optimizer = None, n_runs = 1, epochs = 200):
+
+def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter, optimizer=None, n_runs=1,
+                                epochs=200):
     if hyperparameter == 'weight decay':
-        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs = n_runs, epochs = epochs, weight_decay = m)
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs=n_runs, epochs=epochs,
+                                                    weight_decay=m)
     if hyperparameter == 'epochs':
-        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs = n_runs, epochs = m, optimizer = optimizer)
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs=n_runs, epochs=m,
+                                                    optimizer=optimizer)
+    if hyperparameter == 'learning rate':
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs=n_runs, epochs=epochs,
+                                                    learning_rate=m)
     return acc_train, acc_valid
 
-def cross_validation(images, labels, k, hyperparameter, optimizer = None):
+
+def cross_validation(images, labels, k, hyperparameter, optimizer=None):
     # setup the k-fold split
     folds_x = list(torch.chunk(images, k))
     folds_y = list(torch.chunk(labels, k))
@@ -126,15 +140,16 @@ def cross_validation(images, labels, k, hyperparameter, optimizer = None):
             train_y = torch.cat(train_y)
 
             # n_runs should be 1 for this            
-            acc_train, acc_valid = choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter, optimizer)
-                        
+            acc_train, acc_valid = choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter,
+                                                               optimizer)
+
             acc_valid_mean = (acc_valid_mean + acc_valid)
             acc_train_mean = (acc_train_mean + acc_train)
 
-        acc_train_mean = acc_train_mean/k
-        acc_valid_mean = acc_valid_mean/k
+        acc_train_mean = acc_train_mean / k
+        acc_valid_mean = acc_valid_mean / k
 
-        #append accuracies to tensor
+        # append accuracies to tensor
         if m == start:
             acc_train_list = acc_train_mean.unsqueeze(0)
             acc_valid_list = acc_valid_mean.unsqueeze(0)
@@ -142,7 +157,7 @@ def cross_validation(images, labels, k, hyperparameter, optimizer = None):
             acc_train_list = torch.cat((acc_train_list, acc_train_mean.unsqueeze(0)), 0)
             acc_valid_list = torch.cat((acc_valid_list, acc_valid_mean.unsqueeze(0)), 0)
 
-    #determine optimal value
+    # determine optimal value
     best_m = list(m_range)[torch.argmax(acc_valid_list)]
 
     # return the optimal value for m, the training accuracies, validation accuracies,

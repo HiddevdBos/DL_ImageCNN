@@ -31,7 +31,7 @@ def find_first_ten_instances(images, labels):
     while not found_all:
         if n_found[labels[i]] < 10:
             label = labels[i]
-            images_reordered[label*10+n_found[label]] = images[i]
+            images_reordered[label * 10 + n_found[label]] = images[i]
             n_found[label] += 1
         if all(n_found[j] == 10 for j in range(10)):
             found_all = True
@@ -49,12 +49,13 @@ def vector_to_matrix(vector):
 
 # show plot with 10 examples of each class
 def plotData(images, labels):
-    labels_string = ['T-shirt', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
+    labels_string = ['T-shirt', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag',
+                     'Ankle boot']
     images_reordered = find_first_ten_instances(images, labels)
     fig, ax = plt.subplots(10, 10, sharex='col', sharey='row')
     for i in range(0, 10):
         for j in range(0, 10):
-            pic = vector_to_matrix(images_reordered[i*10+j])
+            pic = vector_to_matrix(images_reordered[i * 10 + j])
             ax[i, j].imshow(pic, cmap='gist_gray', origin='upper')
             ax[i, j].axes.yaxis.set_visible(False)
             if j == 0:
