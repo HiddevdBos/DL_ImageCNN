@@ -1,5 +1,5 @@
 import torch
-from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout
+from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, AvgPool2d, Module, Softmax, BatchNorm2d, Dropout, Sigmoid, LeakyReLU
 
 
 class CNN(Module):
