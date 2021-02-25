@@ -52,7 +52,7 @@ def evaluate_model(test_x, test_y, model):
     return correct / total
 
 
-def train_and_test_model(train_x, train_y, test_x, test_y,
+def train_and_test_model(train_x, train_y, test_x, test_y, cnn_type='standard',
                          n_runs=5, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer=None):
     train_acc = 0
     test_acc = 0
@@ -60,7 +60,7 @@ def train_and_test_model(train_x, train_y, test_x, test_y,
     for i in range(n_runs):
         if n_runs != 1:
             print('run', i + 1, '/', n_runs)
-        model = train_model(train_x, train_y,
+        model = train_model(train_x, train_y, cnn_type,
                             epochs=epochs,
                             learning_rate=learning_rate,
                             weight_decay=weight_decay,
@@ -107,7 +107,7 @@ def select_optimizer(optimizer, parameters):
     return optimizer
 
 
-def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type = 'standard', hyperparameter, optimizer=None, n_runs=1,
+def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type, hyperparameter, optimizer=None, n_runs=1,
                                 epochs=200):
     if hyperparameter == 'weight decay':
         acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs=n_runs, epochs=epochs,
@@ -124,7 +124,7 @@ def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type 
     return acc_train, acc_valid
 
 
-def cross_validation(images, labels, k, hyperparameter, optimizer=None):
+def cross_validation(images, labels, k, cnn_type, hyperparameter, optimizer=None):
     # setup the k-fold split
     folds_x = list(torch.chunk(images, k))
     folds_y = list(torch.chunk(labels, k))
