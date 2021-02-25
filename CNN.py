@@ -1,5 +1,6 @@
 import torch
-from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, AvgPool2d, Module, Softmax, BatchNorm2d, Dropout, Sigmoid, LeakyReLU
+from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, AvgPool2d, Module, Softmax, BatchNorm2d, Dropout, \
+    Sigmoid, LeakyReLU
 
 
 class CNN(Module):
@@ -24,12 +25,12 @@ class CNN(Module):
             self.cnn_layers = Sequential(
                 # 2D convolution layer
                 Conv2d(1, 4, kernel_size=3, stride=1, padding=1),
-                BatchNorm2d(4),
+                # BatchNorm2d(4),
                 ReLU(inplace=True),
                 MaxPool2d(kernel_size=2, stride=2),
                 # 2D convolution layer
                 Conv2d(4, 4, kernel_size=3, stride=1, padding=1),
-                BatchNorm2d(4),
+                # BatchNorm2d(4),
                 ReLU(inplace=True),
                 MaxPool2d(kernel_size=2, stride=2),
             )

@@ -1,8 +1,11 @@
 import sys
 from readData import get_data
-from runModel import choose_train_and_test_model, cross_validation
+from runModel import choose_train_and_test_model, cross_validation, train_and_test_model
 from plots import plotTrainTestError
 
+train_images, train_labels = get_data('fashion-mnist_train.csv')
+test_images, test_labels = get_data('fashion-mnist_test.csv')
+train_and_test_model(train_images,train_labels,test_images,test_labels,'lenet5',n_runs=1)
 
 def show_error():
     print("Please pass the required arguments")
@@ -37,6 +40,7 @@ if __name__ == '__main__':
                 show_error()
             # ---- cross-validation ----
             best_m, acc_train, acc_valid, m_list, m_name = cross_validation(train_images, train_labels,
+                                                                            cnn_type='standard',
                                                                             optimizer=sys.argv[2], k=5,
                                                                             hyperparameter='epochs')
             plotTrainTestError(acc_train, acc_valid, m_name, x_values=m_list)

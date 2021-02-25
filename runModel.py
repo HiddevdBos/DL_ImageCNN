@@ -46,6 +46,7 @@ def train_model(train_x, train_y, cnn_type, epochs=50, learning_rate=0.01, weigh
 
 def evaluate_model(test_x, test_y, model):
     output = model.forward(test_x)
+    print(output[0])
     total = test_y.size(0)
     _, predicted = torch.max(output.data, 1)
     correct = (predicted == test_y).sum()
