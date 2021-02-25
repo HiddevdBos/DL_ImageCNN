@@ -6,8 +6,8 @@ import numpy as np
 
 from CNN import CNN
 
-def train_model(train_x, train_y, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer = None):
-    model = CNN().float()
+def train_model(train_x, train_y, cnn_type, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer = None):
+    model = CNN(cnn_type).float()
     if optimizer:
         optimizer = select_optimizer(optimizer, model.parameters())
     else:
@@ -49,15 +49,14 @@ def evaluate_model(test_x, test_y, model):
     return correct / total
 
 
-def train_and_test_model(train_x, train_y, test_x, test_y,
+def train_and_test_model(train_x, train_y, test_x, test_y, cnn_type,
                          n_runs=5, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None, optimizer = None):
     train_acc = 0
     test_acc = 0
-    
     for i in range(n_runs):
         if n_runs != 1:
             print('run', i+1, '/', n_runs)
-        model = train_model(train_x, train_y,
+        model = train_model(train_x, train_y, cnn_type,
                                   epochs=epochs,
                                   learning_rate=learning_rate,
                                   weight_decay=weight_decay,
@@ -90,19 +89,17 @@ def select_optimizer(optimizer, parameters):
         optimizer = Adam(parameters)
     if optimizer == 'rmsprop':
         optimizer = RMSprop(parameters)
-    if optimizer == 'sgd':
-        optimizer = SGD(parameters)
     return optimizer
 
     
-def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter, optimizer = None, n_runs = 1, epochs = 200):
+def choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type='standard', hyperparameter = 'epochs', optimizer = None, n_runs = 1, epochs = 200):
     if hyperparameter == 'weight decay':
-        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs = n_runs, epochs = epochs, weight_decay = m)
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs = n_runs, epochs = epochs, weight_decay = m)
     if hyperparameter == 'epochs':
-        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, n_runs = n_runs, epochs = m, optimizer = optimizer)
+        acc_train, acc_valid = train_and_test_model(train_x, train_y, valid_x, valid_y, cnn_type, n_runs = n_runs, epochs = m, optimizer = optimizer)
     return acc_train, acc_valid
 
-def cross_validation(images, labels, k, hyperparameter, optimizer = None):
+def cross_validation(images, labels, k, hyperparameter, cnn_type = 'standard', optimizer = None):
     # setup the k-fold split
     folds_x = list(torch.chunk(images, k))
     folds_y = list(torch.chunk(labels, k))
@@ -126,7 +123,7 @@ def cross_validation(images, labels, k, hyperparameter, optimizer = None):
             train_y = torch.cat(train_y)
 
             # n_runs should be 1 for this            
-            acc_train, acc_valid = choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, hyperparameter, optimizer)
+            acc_train, acc_valid = choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type, hyperparameter, optimizer)
                         
             acc_valid_mean = (acc_valid_mean + acc_valid)
             acc_train_mean = (acc_train_mean + acc_train)
