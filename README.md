@@ -16,38 +16,38 @@ tqdm 4.56.2
 
 ## Running the code
 
-The code with the standard model can be ran with the command:
+The code with the standard model can be ran with the command:  
 python3 launch.py optimizer adam
 
-The other versions of the program can be ran with the commands:
-For the model with weight decay:
+The other versions of the program can be ran with the commands:  
+For the model with weight decay:  
 python3 launch.py
 
-For the model with the rmsprop optimizer:
+For the model with the rmsprop optimizer:  
 python3 launch.py optimizer rmsprop
 
-For the model with only one layer:
+For the model with only one layer:  
 python3 launch.py type one-layer
 
-For the model with a sigmoid activation layer:
+For the model with a sigmoid activation layer:  
 python3 launch.py type sigmoid
 
-for the leaky-ReLU activation layer:
+for the leaky-ReLU activation layer:  
 python3 launch.py type leaky-relu
 
-for the model without batchnormalization:
+for the model without batchnormalization:  
 python3 launch.py type no-batch
 
-For the model with a dropout layer:
+For the model with a dropout layer:  
 python3 launch.py dropout
 
-For the model with the LeNet5 architecture with a relu activation layer:
+For the model with the LeNet5 architecture with a relu activation layer:  
 python3 launch.py type lenet5relu
 
-For the model with the LeNet5 architecture with a tanh activation layer:
+For the model with the LeNet5 architecture with a tanh activation layer:  
 python3 launch.py type lenet5tanh
 
-To optimize the learning rate of a specific architecture or a activation function(e.g. the LeNet5 architecture with a relu activation layer):
+To optimize the learning rate of a specific architecture or a activation function(e.g. the LeNet5 architecture with a relu activation layer):  
 python3 launch.py learning-rate lenet5relu
 
 
