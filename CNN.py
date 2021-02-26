@@ -1,5 +1,5 @@
 import torch
-from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, AvgPool2d, Module, Softmax, BatchNorm2d, Dropout, \
+from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, AvgPool2d, Module, BatchNorm2d, Dropout, \
     Sigmoid, LeakyReLU, Tanh
 
 
@@ -55,20 +55,6 @@ class CNN(Module):
                 Conv2d(1, 4, kernel_size=3, stride=1, padding=1),
                 BatchNorm2d(4),
                 ReLU(inplace=True),
-                MaxPool2d(kernel_size=2, stride=2)
-            )
-
-        if cnn_type == 'softmax':
-            self.cnn_layers = Sequential(
-                # 2D convolution layer
-                Conv2d(1, 4, kernel_size=3, stride=1, padding=1),
-                BatchNorm2d(4),
-                Softmax(),
-                MaxPool2d(kernel_size=2, stride=2),
-                # 2D convolution layer
-                Conv2d(4, 4, kernel_size=3, stride=1, padding=1),
-                BatchNorm2d(4),
-                Softmax(),
                 MaxPool2d(kernel_size=2, stride=2)
             )
 
@@ -129,22 +115,23 @@ class CNN(Module):
         x = self.cnn_layers(x)
         self.input_size_linear = x.shape[1] * x.shape[2] * x.shape[3]
 
-        if cnn_type == 'lenet5relu':
-            self.linear_layers = Sequential(
-                Linear(self.input_size_linear, 140),
-                ReLU(inplace=True),
-                Linear(140, 84),
-                ReLU(inplace=True),
-                Linear(84, 10)
-            )
-        if cnn_type == 'lenet5tanh':
-            self.linear_layers = Sequential(
-                Linear(self.input_size_linear, 140),
-                Tanh(),
-                Linear(140, 84),
-                Tanh(),
-                Linear(84, 10)
-            )
+        if cnn_type == 'lenet5relu' or cnn_type == 'lenet5tanh':
+            if cnn_type == 'lenet5relu':
+                self.linear_layers = Sequential(
+                    Linear(self.input_size_linear, 140),
+                    ReLU(inplace=True),
+                    Linear(140, 84),
+                    ReLU(inplace=True),
+                    Linear(84, 10)
+                )
+            if cnn_type == 'lenet5tanh':
+                self.linear_layers = Sequential(
+                    Linear(self.input_size_linear, 140),
+                    Tanh(),
+                    Linear(140, 84),
+                    Tanh(),
+                    Linear(84, 10)
+                )
         else:
             self.linear_layers = Sequential(
                 Linear(self.input_size_linear, 10)

@@ -60,6 +60,8 @@ def train_and_test_model(train_x, train_y, test_x, test_y, cnn_type='standard',
                          dropout_rate=None):
     train_acc = []
     test_acc = []
+    test_acc_total = 0
+    train_acc_total = 0
     for i in range(n_runs):
         if n_runs != 1:
             print('run', i + 1, '/', n_runs)
@@ -71,10 +73,12 @@ def train_and_test_model(train_x, train_y, test_x, test_y, cnn_type='standard',
                             optimizer=optimizer,
                             dropout_rate=dropout_rate)
         acc = evaluate_model(train_x, train_y, model)
-        train_acc.append(acc)
+        train_acc.append(acc.item())
+        train_acc_total = (train_acc_total + acc)
         acc = evaluate_model(test_x, test_y, model)
-        test_acc.append(acc)
-    return np.mean(train_acc), np.std(train_acc), np.mean(test_acc), np.std(test_acc)
+        test_acc.append(acc.item())
+        test_acc_total = (test_acc_total + acc)
+    return train_acc_total/n_runs, np.std(train_acc), test_acc_total/n_runs, np.std(test_acc)
 
 
 def set_hyperparameter(hyperparameter):
