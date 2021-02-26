@@ -4,14 +4,15 @@ A convolutional neural network to classify the images from the Mnist Fashion dat
 It will then perform 10 runs of training the network on the training data and make predictions on the testing data, after which the average accuracy and standard deviation will be returned.
 
 
-##Setup
+## Setup
+
 Requires: 
+
 Python 3.8.5
 numpy 1.19.5
 torch 1.7.1
 matplotlib 3.3.3
 tqdm 4.56.2
-
 ## Running the code
 
 The code with the standard model can be ran with the command:
