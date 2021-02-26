@@ -14,6 +14,7 @@ if __name__ == '__main__':
     train_images, train_labels = get_data('fashion-mnist_train.csv')
     test_images, test_labels = get_data('fashion-mnist_test.csv')
 
+	# run model with weight decay
     if len(sys.argv) < 2:
         # ---- cross-validation ----
         best_m, acc_train, acc_valid, m_list, m_name = cross_validation(train_images, train_labels, k=5,
@@ -34,7 +35,8 @@ if __name__ == '__main__':
         print('average testing accuracy:', acc_test)
         print('standard deviation:', acc_test_sd)
 
-    # ------------------Optimizer--------------------#
+    
+    # run the model with a certain optimizer 
     else:
         if sys.argv[1] == 'optimizer':
             if len(sys.argv) < 3:
@@ -60,6 +62,7 @@ if __name__ == '__main__':
             print('average testing accuracy:', acc_test)
             print('standard deviation:', acc_test_sd)
 
+        # run the model with a certain architecture
         if sys.argv[1] == 'type':
             if len(sys.argv) < 3:
                 show_error()
@@ -82,6 +85,7 @@ if __name__ == '__main__':
             print('average testing accuracy:', acc_test)
             print('standard deviation:', acc_test_sd)
 
+        # optimize the model for the learning rate
         if sys.argv[1] == 'learning_rate':
             # ---- cross-validation ----
             best_m, acc_train, acc_valid, m_list, m_name = cross_validation(train_images, train_labels, k=5,
@@ -104,6 +108,7 @@ if __name__ == '__main__':
             print('average testing accuracy:', acc_test)
             print('standard deviation:', acc_test_sd)
 
+        # train a model with a dropout layer and optimize amount of knowledge that is dropped out
         if sys.argv[1] == 'dropout':
             # ---- cross-validation ----
             best_m, acc_train, acc_valid, m_list, m_name = cross_validation(train_images, train_labels, k=5,
