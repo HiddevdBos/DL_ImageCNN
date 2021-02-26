@@ -6,6 +6,7 @@ import numpy as np
 
 from CNN import CNN
 
+
 # train the model
 def train_model(train_x, train_y, cnn_type, epochs=50, learning_rate=0.01, weight_decay=0.01, batch_size=None,
                 optimizer=None, dropout_rate=None):
@@ -19,7 +20,7 @@ def train_model(train_x, train_y, cnn_type, epochs=50, learning_rate=0.01, weigh
         optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     criterion = CrossEntropyLoss()
     if torch.cuda.is_available():
-#        model = DataParallel(model)
+        #        model = DataParallel(model)
         model = model.cuda()
         criterion = criterion.cuda()
     # default batch size is entire dataset
@@ -45,6 +46,7 @@ def train_model(train_x, train_y, cnn_type, epochs=50, learning_rate=0.01, weigh
 
     # return the model and the average training loss
     return model
+
 
 # evaluate the performance of the model
 def evaluate_model(test_x, test_y, model):
@@ -78,7 +80,8 @@ def train_and_test_model(train_x, train_y, test_x, test_y, cnn_type='standard',
         acc = evaluate_model(test_x, test_y, model)
         test_acc.append(acc.item())
         test_acc_total = (test_acc_total + acc)
-    return train_acc_total/n_runs, np.std(train_acc), test_acc_total/n_runs, np.std(test_acc)
+    return train_acc_total / n_runs, np.std(train_acc), test_acc_total / n_runs, np.std(test_acc)
+
 
 # set the range in which the hyperparameter has to be optimized
 def set_hyperparameter(hyperparameter):
@@ -106,12 +109,13 @@ def set_hyperparameter(hyperparameter):
         m_range = np.arange(start, stop, step)
     return m_name, m_range, start
 
+
 # if a optimizer is selected in the command line, select the correct optimizer
 def select_optimizer(optimizer, parameters):
     if optimizer == 'adam':
-        optimizer = Adam(parameters, lr = 0.01)
+        optimizer = Adam(parameters, lr=0.01)
     if optimizer == 'rmsprop':
-        optimizer = RMSprop(parameters, lr = 0.01)
+        optimizer = RMSprop(parameters, lr=0.01)
     return optimizer
 
 
@@ -163,8 +167,9 @@ def cross_validation(images, labels, k, cnn_type, hyperparameter, optimizer=None
             train_y = torch.cat(train_y)
 
             # n_runs should be 1 for this            
-            acc_train, acc_train_sd, acc_valid, acc_valid_sd = choose_train_and_test_model(train_x, train_y, valid_x, valid_y, m, cnn_type,
-                                                               hyperparameter, optimizer)
+            acc_train, acc_train_sd, acc_valid, acc_valid_sd = choose_train_and_test_model(train_x, train_y, valid_x,
+                                                                                           valid_y, m, cnn_type,
+                                                                                           hyperparameter, optimizer)
 
             acc_valid_mean = (acc_valid_mean + acc_valid)
             acc_train_mean = (acc_train_mean + acc_train)

@@ -5,7 +5,7 @@ from torch.nn import Linear, ReLU, Sequential, Conv2d, MaxPool2d, AvgPool2d, Mod
 
 class CNN(Module):
 
-    def __init__(self, cnn_type, dropout_rate = None):
+    def __init__(self, cnn_type, dropout_rate=None):
         super(CNN, self).__init__()
         if cnn_type == 'standard':
             self.cnn_layers = Sequential(
