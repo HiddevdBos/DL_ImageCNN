@@ -60,7 +60,7 @@ def plotData(images, labels):
             ax[i, j].axes.yaxis.set_visible(False)
             if j == 0:
                 ax[i, j].axes.xaxis.set_ticks([])
-                ax[i, j].set_xlabel('label: ' + labels_string[i], loc='left')
+                ax[i, j].set_xlabel('label: ' + labels_string[i], loc='left', fontsize=7)
             else:
                 ax[i, j].axes.xaxis.set_visible(False)
     plt.tight_layout(pad=0)
